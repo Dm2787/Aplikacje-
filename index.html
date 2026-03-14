@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Materiałówka</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 10px;
+}
+
+/* NEONOWY NAGŁÓWEK */
+.neon-title {
+    font-size: 36px;
+    font-weight: 900;
+    text-align: center;
+    margin: 0;
+    color: #93c5fd;
+    text-shadow:
+        0 0 2px #93c5fd,
+        0 0 4px #60a5fa,
+        0 0 6px rgba(96,165,250,0.4);
+}
+
+/* MAŁY PODPIS POD TYTUŁEM */
+.top-signature {
+    text-align: center;
+    margin-top: 2px;
+    font-family: "Brush Script MT", "Segoe Script", cursive;
+    font-size: 18px;
+    color: #fb923c;
+    text-shadow:
+        0 0 3px #fb923c,
+        0 0 6px #f97316;
+}
+
+/* PŁYWAJĄCA WYSZUKIWARKA */
+.floating-search {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(6px);
+    padding: 12px 0 18px;
+    margin-bottom: 12px;
+    border-bottom: 3px solid #ef4444;
+    border-radius: 0 0 12px 12px;
+    animation: neonBarPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes neonBarPulse {
+    0%   { border-bottom-color: rgba(239, 68, 68, 1); }
+    50%  { border-bottom-color: rgba(239, 68, 68, 0); }
+    100% { border-bottom-color: rgba(239, 68, 68, 1); }
+}
+
+#searchInput {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #ef4444;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 15px;
+}
+
+/* SEKCJE */
+.section {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 15px;
+    color: #cbd5e1;
+}
+
+/* ZAKŁADKI */
+.tabs-container {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tab {
+    padding: 6px 12px;
+    background: #334155;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tab.active {
+    background: #1e3a8a;
+    border-color: #3b82f6;
+    box-shadow: 0 0 8px rgba(59,130,246,0.6);
+    font-weight: 700;
+}
+
+.tab-name {
+    pointer-events: none;
+}
+
+.close-tab {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(255, 80, 80, 0.15);
+    border: 1px solid #f87171;
+    color: #fca5a5;
+    font-size: 14px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-tab:hover {
+    background: #ef4444;
+    color: white;
+    box-shadow: 0 0 8px #ef4444;
+    transform: scale(1.15);
+}
+
+/* INPUTY */
+.scaffold-input,
+.notes-area,
+.calc-input {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 14px;
+}
+
+.notes-area {
+    min-height: 70px;
+    resize: vertical;
+}
+
+/* KALKULATOR */
+.calc-row { margin-bottom: 8px; }
+
+.calc-result {
+    font-size: 15px;
+    margin-top: 6px;
+    padding: 8px;
+    border-radius: 6px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid #22c55e;
+    box-shadow: 0 0 8px rgba(34,197,94,0.3);
+}
+
+/* MATERIAŁY */
+.material-card {
+    border-top: 1px solid #334155;
+    padding-top: 6px;
+    margin-top: 6px;
+}
+
+.material-name {
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+    color: #93c5fd;
+    border-bottom: 1px solid #3b82f6;
+    padding-bottom: 3px;
+}
+
+.dimension-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed #334155;
+}
+
+.dimension-label {
+    font-size: 13px;
+    color: #cbd5e1;
+    transition: 0.25s;
+}
+
+.dimension-row.active-dimension {
+    background: rgba(34,197,94,0.08);
+    box-shadow: 0 0 10px rgba(34,197,94,0.25);
+}
+
+.dimension-row.active-dimension .dimension-label {
+    color: #86efac;
+    border-bottom: 1px solid #22c55e;
+    font-size: 15px;
+    font-weight: 700;
+    transform: scale(1.08);
+}
+
+/* PRZYCISKI ILOŚCI */
+.qty-box { display: flex; gap: 6px; }
+
+.qty-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    border: 1px solid #475569;
+    background: #334155;
+    color: #e2e8f0;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.qty {
+    width: 60px;
+    padding: 4px 6px;
+    text-align: center;
+    border-radius: 4px;
+    border: 1px solid #475569;
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+.qty.selected {
+    border: 2px solid #22c55e !important;
+    background: #052e16;
+}
+
+/* ANIMACJE + / - */
+@keyframes clickPulseGreen {
+    0% { transform: scale(1); box-shadow: 0 0 0px #22c55e; }
+    50% { transform: scale(1.15); box-shadow: 0 0 10px #22c55e; }
+    100% { transform: scale(1); box-shadow: 0 0 0px #22c55e; }
+}
+
+@keyframes clickPulseRed {
+    0% { transform: scale(1); box-shadow: 0 0 0px #ef4444; }
+    50% { transform: scale(1.15); box-shadow: 0 0 10px #ef4444; }
+    100% { transform: scale(1); box-shadow: 0 0 0px #ef4444; }
+}
+
+.plus-click { animation: clickPulseGreen 0.25s ease-out; }
+.minus-click { animation: clickPulseRed 0.25s ease-out; }
+
+/* PODSUMOWANIE */
+.summary-box {
+    white-space: pre-wrap;
+    font-size: 13px;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 8px;
+    background: #0f172a;
+    min-height: 60px;
+}
+
+/* PRZYCISKI DÓŁ */
+.btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #475569;
+    background: #334155;
+    font-size: 14px;
+    cursor: pointer;
+    color: #e2e8f0;
+    transition: 0.2s;
+}
+
+.btn-clear { background: #1f2937; }
+
+.btn-copy {
+    background: #1e3a8a;
+    border-color: #1d4ed8;
+}
+
+.btn-copy:hover {
+    background: #2563eb;
+    box-shadow: 0 0 10px rgba(37,99,235,0.7);
+    transform: scale(1.03);
+}
+
+/* NEONOWE PRZYCISKI USUWANIA */
+.btn-danger {
+    background: linear-gradient(135deg, #7f1d1d, #b91c1c);
+    border: 1px solid #ef4444;
+    color: #fee2e2;
+    box-shadow: 0 0 6px rgba(239,68,68,0.5);
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    box-shadow: 0 0 12px #ef4444;
+    transform: scale(1.05);
+}
+
+/* PODPIS DÓŁ */
+.signature {
+    margin-top: 40px;
+    text-align: center;
+    font-family: "Brush Script MT", "Segoe Script", cursive;
+    font-size: 26px;
+    color: #fb923c;
+    text-shadow:
+        0 0 4px #fb923c,
+        0 0 8px #f97316,
+        0 0 12px rgba(251,146,60,0.6);
+}
+</style>
+</head>
+<body>
+
+<h1 class="neon-title">Materiałówka</h1>
+<div class="top-signature">by Damian Muttke</div>
+
+<div class="floating-search">
+    <input id="searchInput" type="text" placeholder="Szukaj elementu...">
+</div>
+
+<!-- ZAKŁADKI -->
+<div class="section">
+    <div class="section-title">Budowy</div>
+    <div id="tabsContainer" class="tabs-container"></div>
+    <button id="addTabBtn" class="btn" style="margin-top:8px;">Dodaj zakładkę</button>
+</div>
+
+<div class="section">
+    <div class="section-title">Numer rusztowania</div>
+    <input id="scaffoldNumber" class="scaffold-input" type="text">
+</div>
+
+<div class="section">
+    <div class="section-title">Lista materiałów</div>
+    <div id="container"></div>
+</div>
+
+<div class="section">
+    <div class="section-title">Uwagi</div>
+    <textarea id="notesArea" class="notes-area"></textarea>
+    <button id="clearNotesBtn" class="btn btn-danger" style="margin-top:8px;">Usuń uwagi</button>
+</div>
+
+<div class="section">
+    <div class="section-title">Kalkulator m² / m³</div>
+
+    <div class="calc-row">
+        <label>Długość (np. 2,5+2,05+3):</label>
+        <input id="calcLength" class="calc-input" type="text">
+    </div>
+
+    <div class="calc-row">
+        <label>Szerokość:</label>
+        <input id="calcWidth" class="calc-input" type="number" step="0.01">
+    </div>
+
+    <div class="calc-row">
+        <label>Wysokość:</label>
+        <input id="calcHeight" class="calc-input" type="number" step="0.01">
+    </div>
+
+    <div id="calcResult" class="calc-result">Wyniki pojawią się tutaj.</div>
+
+    <button id="calcClearBtn" class="btn btn-danger" style="margin-top:10px;">Wyczyść kalkulator</button>
+</div>
+
+<div class="section">
+    <div class="section-title">Podsumowanie</div>
+    <div id="summaryContent" class="summary-box">Brak elementów do wyświetlenia.</div>
+    <div class="btn-row">
+        <button id="clearAllBtn" class="btn btn-clear">Wyczyść ilości</button>
+        <button id="copyBtn" class="btn btn-copy">Kopiuj</button>
+    </div>
+</div>
+
+<div class="signature">by Damian Muttke</div>
+
+<script>
+const scaffoldInput = document.getElementById("scaffoldNumber");
+const notesArea = document.getElementById("notesArea");
+const container = document.getElementById("container");
+
+const calcLength = document.getElementById("calcLength");
+const calcWidth  = document.getElementById("calcWidth");
+const calcHeight = document.getElementById("calcHeight");
+const calcResult = document.getElementById("calcResult");
+/**************************************
+ *  Z A K Ł A D K I
+ **************************************/
+let tabs = JSON.parse(localStorage.getItem("tabs") || `["Budowa 1"]`);
+let currentTab = localStorage.getItem("currentTab") || "Budowa 1";
+
+function saveTabs() {
+    localStorage.setItem("tabs", JSON.stringify(tabs));
+    localStorage.setItem("currentTab", currentTab);
+}
+
+function renderTabs() {
+    const tabsContainer = document.getElementById("tabsContainer");
+    tabsContainer.innerHTML = "";
+
+    tabs.forEach(tab => {
+        const el = document.createElement("div");
+        el.className = "tab" + (tab === currentTab ? " active" : "");
+        el.innerHTML = `
+            <span class="tab-name">${tab}</span>
+            <span class="close-tab" data-tab="${tab}">✕</span>
+        `;
+
+        el.addEventListener("click", (e) => {
+            if (e.target.classList.contains("close-tab")) return;
+            currentTab = tab;
+            saveTabs();
+            loadData();
+            renderTabs();
+        });
+
+        tabsContainer.appendChild(el);
+    });
+
+    document.querySelectorAll(".close-tab").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const name = e.target.dataset.tab;
+
+            if (tabs.length === 1) {
+                alert("Musi istnieć przynajmniej jedna zakładka.");
+                return;
+            }
+
+            tabs = tabs.filter(t => t !== name);
+            localStorage.removeItem("data_" + name);
+
+            if (currentTab === name) currentTab = tabs[0];
+
+            saveTabs();
+            renderTabs();
+            loadData();
+        });
+    });
+}
+
+document.getElementById("addTabBtn").addEventListener("click", () => {
+    let nr = tabs.length + 1;
+    let newName = "Budowa " + nr;
+
+    while (tabs.includes(newName)) {
+        nr++;
+        newName = "Budowa " + nr;
+    }
+
+    tabs.push(newName);
+    currentTab = newName;
+    saveTabs();
+    renderTabs();
+    clearAllFields();
+});
+
+/**************************************
+ *  D A N E   M A T E R I A Ł Ó W
+ **************************************/
+const data = {
+    "Podkład": [],
+    "Stopa": [],
+    "Stopa regulowana": [],
+    "Pion": ["0,5m","1m","1,5m","2m","2,5m","3m"],
+    "Rygiel": ["0,3m","0,5m","0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Wanga": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Reka": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Diagonal": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Konsola": ["23cm","35cm","46cm","46cm wysuwana","0,7m","0,77m","1,01m","1,25m"],
+    "Blacha stal 23cm": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Blacha alu 23cm": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Blacha francuz": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Lem 0,40m": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Lem 0,60m": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Klapa": ["1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Drabina": ["2m","3m"],
+    "Burtnica aluminiowa": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Burtnica drewniana": ["0,7m","0,77m","1,01m","1,25m","1,65m","1,96m","2,05m","2,5m","3m"],
+    "Plastiki do burtnic": [],
+    "Deski": ["1m","1,5m","2m","2,5m","3m"],
+    "Rura": ["1m","1,5m","2m","2,5m","3m"],
+    "Cwaniak blacha-blacha": ["0,3m","0,5m","0,7m","1m"],
+    "Cwaniak blacha-rygiel": ["0,3m","0,5m","0,7m","1m"],
+    "Chuj na rygla": [],
+    "Chuj na wange": [],
+    "Pizza 30": [],
+    "Pizza 40": [],
+    "Złącza stałe": [],
+    "Złącza obrotowe": [],
+    "Kajdanki": [],
+    "Szczypa": [],
+    "Specjal": [],
+    "Koszyk na rygla": [],
+    "Koszyk na wangę": []
+};
+
+/**************************************
+ *  G E N E R O W A N I E   M A T E R I A Ł ÓW
+ **************************************/
+function generateMaterialList() {
+    container.innerHTML = "";
+
+    Object.keys(data).forEach(material => {
+        const card = document.createElement("div");
+        card.className = "material-card";
+        card.innerHTML = `<div class="material-name">${material}</div>`;
+
+        if (data[material].length === 0) {
+            const key = `${material}_single`;
+            card.innerHTML += `
+                <div class="dimension-row">
+                    <div class="dimension-label">szt.</div>
+                    <div class="qty-box">
+                        <button class="qty-btn" data-delta="-1" data-key="${key}">−</button>
+                        <input class="qty" data-key="${key}" type="number" min="0" value="0">
+                        <button class="qty-btn" data-delta="1" data-key="${key}">+</button>
+                    </div>
+                </div>`;
+        } else {
+            data[material].forEach(wymiar => {
+                const key = `${material}_${wymiar}`;
+                card.innerHTML += `
+                    <div class="dimension-row">
+                        <div class="dimension-label">${wymiar}</div>
+                        <div class="qty-box">
+                            <button class="qty-btn" data-delta="-1" data-key="${key}">−</button>
+                            <input class="qty" data-key="${key}" type="number" min="0" value="0">
+                            <button class="qty-btn" data-delta="1" data-key="${key}">+</button>
+                        </div>
+                    </div>`;
+            });
+        }
+
+        container.appendChild(card);
+    });
+}
+
+/**************************************
+ *  K A L K U L A T O R
+ **************************************/
+function calculateAreaVolume() {
+    let lengthInput = calcLength.value.replace(",", ".");
+    let parts = lengthInput.split("+").map(v => parseFloat(v.trim().replace(",", ".")));
+
+    let totalLength = 0;
+    parts.forEach(n => { if (!isNaN(n)) totalLength += n; });
+
+    let width  = parseFloat((calcWidth.value  || "0").replace(",", "."))  || 0;
+    let height = parseFloat((calcHeight.value || "0").replace(",", ".")) || 0;
+
+    let area   = totalLength * width;
+    let volume = totalLength * width * height;
+
+    if (!lengthInput && !width && !height) {
+        calcResult.innerHTML = "Wyniki pojawią się tutaj.";
+    } else {
+        calcResult.innerHTML =
+            `Suma długości: <b>${totalLength.toFixed(2)} m</b><br>` +
+            `Szerokość: <b>${width.toFixed(2)} m</b><br>` +
+            `Wysokość: <b>${height.toFixed(2)} m</b><br>` +
+            `m²: <b>${area.toFixed(2)}</b><br>` +
+            `m³: <b>${volume.toFixed(2)}</b>`;
+    }
+
+    return { totalLength, width, height, area, volume };
+}
+
+calcLength.addEventListener("input", () => { calculateAreaVolume(); updateSummary(); saveData(); });
+calcWidth.addEventListener("input",  () => { calculateAreaVolume(); updateSummary(); saveData(); });
+calcHeight.addEventListener("input", () => { calculateAreaVolume(); updateSummary(); saveData(); });
+
+document.getElementById("calcClearBtn").addEventListener("click", () => {
+    calcLength.value = "";
+    calcWidth.value  = "";
+    calcHeight.value = "";
+    calcResult.innerHTML = "Wyniki pojawią się tutaj.";
+    updateSummary();
+    saveData();
+});
+/**************************************
+ *  A N I M A C J E   + / -
+ **************************************/
+function animateButton(btn, delta) {
+    const cls = delta > 0 ? "plus-click" : "minus-click";
+    btn.classList.remove(cls);
+    void btn.offsetWidth;
+    btn.classList.add(cls);
+}
+
+container.addEventListener("click", (e) => {
+    if (!e.target.classList.contains("qty-btn")) return;
+
+    const btn   = e.target;
+    const delta = parseInt(btn.dataset.delta, 10);
+    const input = btn.parentElement.querySelector("input.qty");
+
+    animateButton(btn, delta);
+
+    let value = parseInt(input.value) || 0;
+    value = Math.max(0, value + delta);
+
+    input.value = value;
+    updateQtyHighlight(input);
+    updateDimensionHighlight(input);
+    updateSummary();
+    saveData();
+});
+
+/**************************************
+ *  P O D Ś W I E T L A N I E
+ **************************************/
+function updateDimensionHighlight(input) {
+    const row = input.closest(".dimension-row");
+    if (!row) return;
+    const value = parseInt(input.value) || 0;
+    if (value > 0) row.classList.add("active-dimension");
+    else row.classList.remove("active-dimension");
+}
+
+function updateQtyHighlight(input) {
+    const value = parseInt(input.value) || 0;
+    if (value > 0) input.classList.add("selected");
+    else input.classList.remove("selected");
+}
+
+document.addEventListener("input", (e) => {
+    if (e.target.classList.contains("qty")) {
+        updateQtyHighlight(e.target);
+        updateDimensionHighlight(e.target);
+        updateSummary();
+        saveData();
+    }
+});
+
+/**************************************
+ *  W Y S Z U K I W A R K A
+ **************************************/
+document.getElementById("searchInput").addEventListener("input", function () {
+    const text = this.value.toLowerCase();
+    document.querySelectorAll(".material-card").forEach(item => {
+        const name = item.querySelector(".material-name").textContent.toLowerCase();
+        item.style.display = name.includes(text) ? "" : "none";
+    });
+});
+
+/**************************************
+ *  P O D S U M O W A N I E
+ **************************************/
+function updateSummary() {
+    const box = document.getElementById("summaryContent");
+    let summary = "";
+
+    /* MATERIAŁY */
+    document.querySelectorAll("input.qty").forEach(input => {
+        const value = parseInt(input.value) || 0;
+        if (value > 0) {
+            const parent = input.closest(".material-card");
+            const name = parent.querySelector(".material-name").textContent;
+            const dimEl = input.closest(".dimension-row");
+            const dimension = dimEl ? dimEl.querySelector(".dimension-label").textContent : "";
+            summary += `${name} ${dimension} — ${value} szt.\n`;
+        }
+    });
+
+    /* NUMER RUSZTOWANIA */
+    if (scaffoldInput.value.trim() !== "")
+        summary += `\nNumer rusztowania: ${scaffoldInput.value.trim()}\n`;
+
+    /* UWAGI */
+    if (notesArea.value.trim() !== "")
+        summary += `\nUwagi:\n${notesArea.value.trim()}\n`;
+
+    /* KALKULATOR */
+    const calc = calculateAreaVolume();
+    if (calc.totalLength > 0 || calc.width > 0 || calc.height > 0) {
+        summary += `\nKalkulator:\n`;
+        summary += `Suma długości: ${calc.totalLength.toFixed(2)} m\n`;
+        summary += `Szerokość: ${calc.width.toFixed(2)} m\n`;
+        summary += `Wysokość: ${calc.height.toFixed(2)} m\n`;
+        summary += `m²: ${calc.area.toFixed(2)}\n`;
+        summary += `m³: ${calc.volume.toFixed(2)}\n`;
+    }
+
+        if (summary === "") summary = "Brak elementów do wyświetlenia.";
+    box.textContent = summary;
+}
+
+/**************************************
+ *  Z A P I S   D A N Y C H
+ **************************************/
+function saveData() {
+    const all = {};
+
+    document.querySelectorAll("input.qty").forEach(input => {
+        all[input.dataset.key] = input.value;
+    });
+
+    all.scaffold   = scaffoldInput.value;
+    all.notes      = notesArea.value;
+    all.calcLength = calcLength.value;
+    all.calcWidth  = calcWidth.value;
+    all.calcHeight = calcHeight.value;
+
+    localStorage.setItem("data_" + currentTab, JSON.stringify(all));
+}
+
+/**************************************
+ *  O D C Z Y T   D A N Y C H
+ **************************************/
+function loadData() {
+    const saved = JSON.parse(localStorage.getItem("data_" + currentTab) || "{}");
+
+    document.querySelectorAll("input.qty").forEach(input => {
+        input.value = saved[input.dataset.key] || 0;
+        updateQtyHighlight(input);
+        updateDimensionHighlight(input);
+    });
+
+    scaffoldInput.value = saved.scaffold   || "";
+    notesArea.value     = saved.notes      || "";
+    calcLength.value    = saved.calcLength || "";
+    calcWidth.value     = saved.calcWidth  || "";
+    calcHeight.value    = saved.calcHeight || "";
+
+    calculateAreaVolume();
+    updateSummary();
+}
+
+/**************************************
+ *  NATYCHMIASTOWE AKTUALIZACJE UWAG I RUSZTOWANIA
+ **************************************/
+notesArea.addEventListener("input", () => {
+    updateSummary();
+    saveData();
+});
+
+scaffoldInput.addEventListener("input", () => {
+    updateSummary();
+    saveData();
+});
+
+/**************************************
+ *  R E S E T
+ **************************************/
+function clearAllFields() {
+    document.querySelectorAll("input.qty").forEach(input => {
+        input.value = 0;
+        updateQtyHighlight(input);
+        updateDimensionHighlight(input);
+    });
+    scaffoldInput.value = "";
+    notesArea.value = "";
+    calcLength.value = "";
+    calcWidth.value = "";
+    calcHeight.value = "";
+    calcResult.innerHTML = "Wyniki pojawią się tutaj.";
+    updateSummary();
+    saveData();
+}
+
+document.getElementById("clearAllBtn").addEventListener("click", () => {
+    clearAllFields();
+});
+
+document.getElementById("clearNotesBtn").addEventListener("click", () => {
+    notesArea.value = "";
+    updateSummary();
+    saveData();
+});
+
+/**************************************
+ *  K O P I O W A N I E
+ **************************************/
+document.getElementById("copyBtn").addEventListener("click", () => {
+    navigator.clipboard.writeText(document.getElementById("summaryContent").textContent);
+    alert("Skopiowano podsumowanie do schowka.");
+});
+
+/**************************************
+ *  S T A R T
+ **************************************/
+renderTabs();
+generateMaterialList();
+loadData();
+updateSummary();
+</script>
+</body>
+</html>
